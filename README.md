@@ -93,7 +93,7 @@ var person1 = new Person("xiaoming",21,"police");
 var person2 = new Person("xiaohong",23,"engineer");
 
 person1.humanity.push("善良");
-console.log(person2.humanity); // "贪欲","食欲","同理心","嫉妒"
+console.log(person2.humanity); // "贪欲","食欲","同理心","嫉妒","善良"
 console.log(person1.humanity); // "贪欲","食欲","同理心","嫉妒","善良"
 
 person1.organ.push("尾巴");
