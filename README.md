@@ -104,6 +104,223 @@ console.log(person1.organ); //"手","眼","嘴巴","尾巴"
 
 好了，今天就写js中的创建对象，明天总结一下js中的类的继承。什么叫继承呢？举个栗子，人类同时也是地球上的生物对不？那人类应该继承生物这个类。具有生物的特质。明天再细讲。
 
+---
+
+# 类的继承
+前面咱们也讲了，类是某一类别事物的抽象。那么类的继承应该如何理解呢？假如人类是一个类。哺乳动物也是一个类，动物也是一个类。要想让人类有哺乳动物的特征，让人类有动物的特征。我们就让人类这个类去继承哺乳动物这个类。让哺乳动物去继承动物这个类。这样人类就同时有了哺乳动物和动物的特征，哺乳动物也有了动物的特征。
+
+许多面向对象的语言都支持两种继承方式：接口继承和实现继承，接口继承只继承方法的签名。而实现继承则继承实际的方法。由于js中函数没有签名。所以js中无法实现接口继承，只能支持实现继承。而且，js中的接口继承主要是依靠原型链实现的
+
+## 什么是原型链？
+可以这样简单的描述：利用原型让一个引用类型继承另一个引用类型的属性和方法，另一个引用类型也可以利用原型去继承其他引用类型的属性和方法。这样就形成了一个链条。叫做原型链。
+
+举个栗子：
+
+```
+// 动物类
+function Animal(){
+	this.hasLive = "yes";
+}
+Animal.prototype.run = function(){
+	alert("i am animal, i can run");
+}
+
+//人类
+function Person(name,age){
+	this.name= name;
+	this.age = age;
+}
+
+//让人类继承动物类
+Person.prototype ＝ new Animal();
+
+
+//验证一下现在人类有没有动物的特征？
+var person1 = new Person("xiaoming",22);
+console.log(person1.name); //xiaoming
+person1.run(); // i am animal, i can run
+
+```
+
+## 怎样实现类的继承
+### 1.直接把父类的一个实例绑在子类的原型上。还是上边那个栗子
+
+```
+// 动物类
+function Animal(){
+	this.hasLive = "yes";
+}
+Animal.prototype.run = function(){
+	alert("i am animal, i can run");
+}
+
+//人类
+function Person(name,age){
+	this.name= name;
+	this.age = age;
+}
+
+//让人类继承动物类
+Person.prototype ＝ new Animal();
+
+
+//验证一下现在人类有没有动物的特征？
+var person1 = new Person("xiaoming",22);
+console.log(person1.name); //xiaoming
+person1.run(); // i am animal, i can run
+
+```
+这样继承有没有什么问题？把 new Animal() 赋值给 Person的prototype。相当于重写了Person的原型了。也就是说Person丢失了原型中的constructor属性。那以后Person的实例就没法判断是不是属于Person了。这也就失去类的意义了。
+
+### 2.借用构造函数（constructor stealing）
+什么叫借用构造函数呢？js中的类本来不就是一个构造函数么。这种技术的思想可以这样理解，在子类型的构造函数内部调用父构造函数。简单的说。子构造函数里的语句变成了子构造函数的语句加上父构造函数的语句。还说举栗子说明借用构造函数
+
+```
+// 动物类
+function Animal(){
+	this.hasLive = "yes";
+}
+
+//人类
+function Person(name,age){
+	this.name= name;
+	this.age = age;
+}
+
+```
+以上是两个类。人类这个构造函数如何借用动物类这个构造函数呢？可以这样写
+
+```
+// 动物类
+function Animal(){
+	this.hasLive = "yes";
+}
+
+//人类
+function Person(name,age){
+	Animal.call(this);   //借用了animal的构造函数
+	this.name= name;
+	this.age = age;
+}
+
+var person1 = new Person("xiaoming",23);
+console.log(person1.hasLive)   //yes
+
+```
+上面的这种写法相当于下面这样的代码。
+
+```
+// 动物类
+function Animal(){
+	this.hasLive = "yes";
+}
+
+//人类
+function Person(name,age){
+	this.hasLive = "yes";
+	this.name= name;
+	this.age = age;
+}
+
+var person1 = new Person("xiaoming",23);
+console.log(person1.hasLive)   //yes
+
+```
+思考一下如果仅仅用借用构造函数来实现继承会出现什么样的问题？
+
+方法都在构造函数里定义，因此函数的复用就无从谈起了。这就是只用构造函数来实现继承带来的瑕疵。
+
+### 3.组合继承（combination inheritance）
+组合继承就是结合前面两种继承方式的优势。衍生出来的一种继承方式。就是将原型链和借用构造函数的技术结合到一起。发挥二者的长处的一种继承方式。基本思想是通过原型链实现对原型属性和方法的继承。而又通过借用构造函数来实现对实例属性的继承。这种方式是js中最常用最受欢迎的一种继承方式。下面是举栗子的时间
+
+```
+// 动物类
+function Animal(){
+	this.hasLive = "yes";
+}
+Animal.prototype.run = function(){
+	alert("i am animal, i can run");
+}
+
+//人类
+function Person(name,age){
+	Animal.call(this); //继承动物类中的属性
+	this.name= name;
+	this.age = age;
+}
+
+//让人类继承动物类
+Person.prototype ＝ new Animal();
+
+//让人类的原型中的constructor重新指向人类
+Person.prototype.constructor = Person;
+
+//验证一下现在人类有没有动物的特征？
+var person1 = new Person("xiaoming",22);
+console.log(person1.name); //xiaoming
+console.log(person1.hasLive); //true
+person1.run(); // i am animal, i can run
+
+//验证一下人类的实例是不是归属于人类?
+console.log(person1 instanceof Person) //true
+
+```
+### 4.寄生组合式继承
+刚才说过。组合继承式js最常用的寄生模式。不过，它也有自己的一点点小瑕疵，它的瑕疵就是无论什么情况下，都会掉用两次父构造函数。
+
+```
+// 动物类
+function Animal(){
+	this.hasLive = "yes";
+}
+Animal.prototype.run = function(){
+	alert("i am animal, i can run");
+}
+
+//人类
+function Person(name,age){
+	Animal.call(this); 				//第一次掉用
+	this.name= name;
+	this.age = age;
+}
+
+//让人类继承动物类
+Person.prototype ＝ new Animal();  //第二次掉用
+Person.prototype.constructor = Person;
+
+```
+以上标出了两次掉用。
+
+寄生组合式继承的基本思想是创建一个空对象，空对象的原型是父构造函数的原型，然后把这个空对象再变成子构造函数的原型。下面看看寄生组合式继承的基本模式。
+
+```
+// 动物类
+function Animal(){
+	this.hasLive = "yes";
+}
+Animal.prototype.run = function(){
+	alert("i am animal, i can run");
+}
+
+//人类
+function Person(name,age){
+	Animal.call(this); 		
+	this.name= name;
+	this.age = age;
+}
+
+//创造一个空的构造函数（空类）
+function F(){}
+F.prototype = Animal.prototype;
+
+//让人类继承动物类
+Person.prototype ＝ new F();
+Person.prototype.constructor = Person;
+
+```
+
+寄生组合式继承比组合继承运行效率更高。即避免了在子类的原型上创建多于的属性。又能正确的使用instanceof 和isPrototypeof(). 效率更高。推荐使用此种方式。
+
 
 
 
