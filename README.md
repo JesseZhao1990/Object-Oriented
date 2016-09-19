@@ -84,7 +84,7 @@ function Person(name,age,job){
 Person.prototype = {
 	constructor: Person,
 	humanity:["贪欲","食欲","同理心","嫉妒"],
-	sayName = function(){
+	sayName : function(){
 		alert(this.name);
 	}
 }
@@ -132,7 +132,7 @@ function Person(name,age){
 }
 
 //让人类继承动物类
-Person.prototype ＝ new Animal();
+Person.prototype = new Animal();
 
 
 //验证一下现在人类有没有动物的特征？
@@ -161,7 +161,7 @@ function Person(name,age){
 }
 
 //让人类继承动物类
-Person.prototype ＝ new Animal();
+Person.prototype = new Animal();
 
 
 //验证一下现在人类有没有动物的特征？
@@ -250,7 +250,7 @@ function Person(name,age){
 }
 
 //让人类继承动物类
-Person.prototype ＝ new Animal();
+Person.prototype = new Animal();
 
 //让人类的原型中的constructor重新指向人类
 Person.prototype.constructor = Person;
@@ -285,7 +285,7 @@ function Person(name,age){
 }
 
 //让人类继承动物类
-Person.prototype ＝ new Animal();  //第二次掉用
+Person.prototype = new Animal();  //第二次掉用
 Person.prototype.constructor = Person;
 
 ```
@@ -314,7 +314,7 @@ function F(){}
 F.prototype = Animal.prototype;
 
 //让人类继承动物类
-Person.prototype ＝ new F();
+Person.prototype = new F();
 Person.prototype.constructor = Person;
 
 ```
